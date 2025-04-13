@@ -53,7 +53,7 @@ export class MapComponent implements OnInit {
     });
 
     breweryArray.forEach((brewery) => {
-      const lat = brewery.latitude
+      const lat = brewery.latitude;
       const long = brewery.longitude;
 
       if (lat === null || long === null) {
