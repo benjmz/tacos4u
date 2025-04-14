@@ -1,12 +1,13 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import "@arcgis/map-components/components/arcgis-map";
-import { BeerLocationsService } from './beer-locations.service';
-import { Brewery } from '../brewery.dto';
+import { BeerLocationsService } from '../../services/beer-locations.service';
+import { Brewery } from '../types/brewery.dto';
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol.js";
 import Graphic from "@arcgis/core/Graphic.js";
 import Point from "@arcgis/core/geometry/Point.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer.js";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference.js";
+import { GeocodingService } from '../../services/geocoding.service';
 
 @Component({
   selector: 'app-map',
@@ -19,7 +20,7 @@ export class MapComponent implements OnInit {
   breweries : any[] = [];
   pageNumber : number = 1;
 
-  constructor(private beerService: BeerLocationsService) {}
+  constructor(private beerService: BeerLocationsService, private geocodingService: GeocodingService) {}
 
   ngOnInit() {}
 
@@ -33,13 +34,12 @@ export class MapComponent implements OnInit {
         console.log('Pagination complete! Ended in page:', this.pageNumber)
         this.breweries = breweryArray;
         console.log(this.breweries);
-        this.generateBreweries(this.breweries)
+        this.generateBreweries(this.breweries);
       }
-      
-    })
+    });
   }
 
-  generateBreweries(breweryArray : any[]) {
+  async generateBreweries(breweryArray : any[]) {
     let geometryCollection : any[]= []
 
     var simpleMarker = new SimpleMarkerSymbol({
@@ -49,17 +49,21 @@ export class MapComponent implements OnInit {
         width: 1
       },
       size: 12,
-      style: "circle" // Possible styles: "circle", "square", "cross", "x", "triangle", "diamond"
+      style: "square" 
     });
 
-    breweryArray.forEach((brewery) => {
-      const lat = brewery.latitude;
-      const long = brewery.longitude;
+    for (var i = 0; i < breweryArray.length; i++) {
+      const brewery = breweryArray[i];
+      let lat = brewery.latitude;
+      let long = brewery.longitude;
 
       if (lat === null || long === null) {
-        // geocodedBrewery = geocodeBrewery(brewrery);
-        // lat = geocodeBrewery.lat;
-        // long = geocodeBrewry.long;
+      lat = await this.geocodingService.geocodeBrewery(brewery).then((geocoded : any) => {
+          return geocoded.latitude;
+        });
+      long = await this.geocodingService.geocodeBrewery(brewery).then((geocoded : any) => {
+          return geocoded.longitude;
+        });
       }
 
       const breweryPoint = new Point({
@@ -71,11 +75,11 @@ export class MapComponent implements OnInit {
       const breweryGraphic = new Graphic({
         geometry: breweryPoint,
         symbol: simpleMarker
-      })
-      geometryCollection.push(breweryGraphic)
-    }
-  
-  );
+      });
+
+      geometryCollection.push(breweryGraphic)  
+    };
+
     const layer = new FeatureLayer({
       source: geometryCollection,
       title: 'Austin Breweries',
@@ -97,24 +101,7 @@ export class MapComponent implements OnInit {
     if (arcgisMap){
       arcgisMap?.addLayer(layer);
     }
-    
   };
-
-async geocodeBrewery(brewery : any) {
-  const breweryAddress = brewery.address_1.replace(' ', '+');
-  const breweryCity = brewery.city.replace(' ','+');
-  const breweryState = brewery.state.replace(' ','+');
-
-  const address = (breweryAddress) ? `?street=${breweryAddress}` : '';
-  const city = (breweryCity) ? `&city=${breweryCity}` : '';
-  const state = (breweryState) ? `&state=${breweryState}` : '';
-
-  const baseURL = 'https://geocoding.geo.census.gov/geocoder/locations/address';
-  const params = address+city+state;
-  const endParams = '&format=json&benchmark=4';
-
-
-}
 
   arcgisViewReadyChange(event: CustomEvent) {
     this.paginateAPI(this.pageNumber, this.breweries);   

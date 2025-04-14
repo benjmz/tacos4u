@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Brewery } from '../brewery.dto';
+import { Brewery } from '../features/types/brewery.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +13,5 @@ export class BeerLocationsService {
   getBeerData(pageNumber: number) : Observable<any[]> {
     const response = this.http.get<any[]>(`${this.apiURL}?by_city=Austin&page=${pageNumber}`);
     return response;
-
-    /*
-    
-    */
   }
-
 }
