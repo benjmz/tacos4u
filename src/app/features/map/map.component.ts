@@ -1,5 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import "@arcgis/map-components/components/arcgis-map";
+import '@esri/calcite-components/components/calcite-shell';
 import { BeerLocationsService } from '../../services/beer-locations.service';
 import { Brewery } from '../types/brewery.dto';
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol.js";
