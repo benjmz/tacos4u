@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { MapComponent } from './features/map/map.component';
-import { HeaderComponent } from './features/header/header.component';
+import { ShellComponent } from './features/shell/shell.component';
 import "@esri/calcite-components";
 import "@esri/calcite-components/dist/calcite/calcite.css";
 
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MapComponent, HeaderComponent],
+  imports: [RouterOutlet, ShellComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
