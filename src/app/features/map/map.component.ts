@@ -32,7 +32,7 @@ export class MapComponent implements OnInit {
         this.pageNumber = this.pageNumber + 1;
         this.paginateAPI(this.pageNumber, breweryArray);
       } else {
-        console.log('Pagination complete! Ended in page:', this.pageNumber)
+        console.log('Pagination complete! Ended in page:', this.pageNumber);
         this.breweries = breweryArray;
         console.log(this.breweries);
         this.generateBreweries(this.breweries);
@@ -41,12 +41,12 @@ export class MapComponent implements OnInit {
   }
 
   async generateBreweries(breweryArray : any[]) {
-    let geometryCollection : any[]= []
+    let geometryCollection : any[]= [];
 
     var simpleMarker = new SimpleMarkerSymbol({
-      color: [226, 119, 40], // RGB color
+      color: [226, 119, 40], 
       outline: {
-        color: [255, 255, 255], // White outline
+        color: [255, 255, 255],
         width: 1
       },
       size: 12,
@@ -78,7 +78,7 @@ export class MapComponent implements OnInit {
         symbol: simpleMarker
       });
 
-      geometryCollection.push(breweryGraphic)  
+      geometryCollection.push(breweryGraphic);
     };
 
     const layer = new FeatureLayer({
@@ -106,7 +106,6 @@ export class MapComponent implements OnInit {
 
   arcgisViewReadyChange(event: CustomEvent) {
     this.paginateAPI(this.pageNumber, this.breweries);   
-    const arcgisMap : HTMLArcgisMapElement | null = document.querySelector("arcgis-map");
     console.log('Map view is ready!');
   }
 }
