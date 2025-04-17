@@ -6,6 +6,7 @@ import '@esri/calcite-components/components/calcite-button';
 import '@esri/calcite-components/components/calcite-dropdown';
 import '@esri/calcite-components/components/calcite-dropdown-group';
 import '@esri/calcite-components/components/calcite-dropdown-item';
+import { UserLocationService } from '../../services/user-location.service';
 
 @Component({
   selector: 'app-header',
@@ -16,4 +17,9 @@ import '@esri/calcite-components/components/calcite-dropdown-item';
 })
 export class HeaderComponent {
 
+  constructor(private userLocationService : UserLocationService){}
+
+  displayUserLocation(event : MouseEvent) {
+    console.log(this.userLocationService.getUserLocation());
+  }
 }

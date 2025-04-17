@@ -18,14 +18,14 @@ import { GeocodingService } from '../../services/geocoding.service';
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MapComponent implements OnInit {
-  breweries : any[] = [];
+  breweries : Brewery[] = [];
   pageNumber : number = 1;
 
   constructor(private beerService: BeerLocationsService, private geocodingService: GeocodingService) {}
 
   ngOnInit() {}
 
-  paginateAPI(pageNumber : number, breweryArray : any[]) {
+  paginateAPI(pageNumber : number, breweryArray : Brewery[]) {
     this.beerService.getBeerData(pageNumber).subscribe(brewData => {
       if (brewData.length > 0) {
         breweryArray = breweryArray.concat(brewData);
@@ -40,16 +40,12 @@ export class MapComponent implements OnInit {
     });
   }
 
-  async generateBreweries(breweryArray : any[]) {
+  async generateBreweries(breweryArray : Brewery[]) {
     let geometryCollection : any[]= [];
 
     var simpleMarker = new SimpleMarkerSymbol({
-      color: [226, 119, 40], 
-      outline: {
-        color: [255, 255, 255],
-        width: 1
-      },
-      size: 12,
+      color: 'red', 
+      size: '12px',
       style: "square" 
     });
 
@@ -57,14 +53,21 @@ export class MapComponent implements OnInit {
       const brewery = breweryArray[i];
       let lat = brewery.latitude;
       let long = brewery.longitude;
+      const address = brewery.address_1;
 
-      if (lat === null || long === null) {
-      lat = await this.geocodingService.geocodeBrewery(brewery).then((geocoded : any) => {
-          return geocoded.latitude;
-        });
-      long = await this.geocodingService.geocodeBrewery(brewery).then((geocoded : any) => {
-          return geocoded.longitude;
-        });
+      const latNull = (lat === null);
+      const longNull = (long === null);
+      const addyNull = (address === null);
+
+      // if (latNull && longNull && addyNull) { return }
+
+      if (latNull || longNull) {
+        lat = await this.geocodingService.geocodeBrewery(brewery).then((geocoded : any) => {
+            return geocoded.latitude;
+          });
+        long = await this.geocodingService.geocodeBrewery(brewery).then((geocoded : any) => {
+            return geocoded.longitude;
+          });
       }
 
       const breweryPoint = new Point({
@@ -73,9 +76,27 @@ export class MapComponent implements OnInit {
         spatialReference: SpatialReference.WGS84
       });
 
+      const breweryAttributes = {
+        brewery_type: brewery.brewery_type,
+        address_1: brewery.address_1,
+        address_2: brewery.address_2,
+        address_3: brewery.address_3,
+        city: brewery.city,
+        state_province: brewery.state_province,
+        postal_code: brewery.postal_code,
+        country: brewery.country,
+        longitude: long,
+        latitude: lat,
+        phone: brewery.phone,
+        website_url: brewery.website_url,
+        state: brewery.state,
+        street: brewery.street,
+      }
+
       const breweryGraphic = new Graphic({
         geometry: breweryPoint,
-        symbol: simpleMarker
+        symbol: simpleMarker,
+        attributes: breweryAttributes
       });
 
       geometryCollection.push(breweryGraphic);
@@ -89,8 +110,8 @@ export class MapComponent implements OnInit {
         alias: "ObjectID",
         type: "oid"
       }, {
-        name: "place",
-        alias: "Place",
+        name: "brewery_type",
+        alias: "Brewery Type",
         type: "string"
       }],
       objectIdField: "ObjectID",

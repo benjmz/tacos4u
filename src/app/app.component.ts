@@ -12,5 +12,5 @@ import "@esri/calcite-components/dist/calcite/calcite.css";
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'tacos4u';
+
 }

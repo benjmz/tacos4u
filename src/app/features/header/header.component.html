@@ -3,6 +3,6 @@
         description="Find breweries near you.">
     </calcite-navigation-logo>
     <div class="header-footer" slot="content-end">
-            <calcite-button slot="trigger">Select landform</calcite-button>
+            <calcite-button (click)="displayUserLocation($event)"  slot="trigger">Select landform</calcite-button>
     </div>
 </calcite-navigation>
